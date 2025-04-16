@@ -31,7 +31,7 @@ import requests
 # Local imports
 ##################################
 from gdelt.dateFuncs import (_dateRanger, _gdeltRangeString)
-from gdelt.getHeaders import _events1Heads, _events2Heads, _mentionsHeads, \
+from gdelt.getHeaders import _events2Heads, _mentionsHeads, \
     _gkgHeads
 from gdelt.helpers import _cameos, _tableinfo
 from gdelt.inputChecks import (_date_input_check)
