@@ -125,7 +125,7 @@ def _dateRanger(originalArray):
             return np.array(dates)
 
 
-def _gdeltRangeString(element, coverage=None, version=2.0):
+def _gdeltRangeString(element, coverage=None):
     """Takes a numpy datetime and converts to string"""
 
     ########################
@@ -161,7 +161,7 @@ def _gdeltRangeString(element, coverage=None, version=2.0):
 
 
         if element.date() == datetime.datetime.now().date():
-            if coverage and int(version) != 1:
+            if coverage:
 
                 converted = np.array(
                     list(map(
@@ -175,7 +175,7 @@ def _gdeltRangeString(element, coverage=None, version=2.0):
                     minute=multiple, second=0)-datetime.timedelta(minutes=15)).strftime('%Y%m%d%H%M%S')
 
         else:
-            if coverage and int(version) != 1:
+            if coverage:
                 converted = restOfDay = np.array(
                     list(map(
                         lambda x: np.datetime64(parse(str(element) + " " + x)
@@ -221,7 +221,7 @@ def _gdeltRangeString(element, coverage=None, version=2.0):
         ####################
         # Return all 15 min intervals
         ####################
-        if coverage and int(version) != 1:
+        if coverage:
 
             converted = []
             for i in element:
@@ -239,48 +239,3 @@ def _gdeltRangeString(element, coverage=None, version=2.0):
                             "this query if you do not want to "
                             "continue.".format(len(converted.tolist())))
                 warnings.warn(warnText)
-
-    ########################
-    # Version 1 Datestrings
-    #########################
-    if int(version) == 1:
-        if isinstance(converted, list) is True:
-
-            converted = list(
-                map(lambda x: np.where((parse(x) >= parse(
-                    '2013 04 01')), parse(x).strftime('%Y%m%d%H%M%S')[:8],
-                                       np.where((parse(x) < parse(
-                                           '2006 01 01') and (
-                                                     int(version) == 1)),
-                                                parse(x).strftime(
-                                                    '%Y%m%d%H%M%S')[:4],
-                                                parse(x).strftime(
-                                                    '%Y%m%d%H%M%S')[:6]))
-                    , converted))
-            converted = list(map(lambda x: x.tolist(), converted))
-            converted = list(set(converted))  # account for duplicates
-        else:
-            converted = np.where((parse(converted) >= parse('2013 04 01')),
-                                 parse(converted).strftime('%Y%m%d%H%M%S')[:8],
-                                 np.where((parse(converted) < parse(
-                                     '2006 01 01') and (int(version) == 1)),
-                                          parse(converted).strftime(
-                                              '%Y%m%d%H%M%S')[:4],
-                                          parse(converted).strftime(
-                                              '%Y%m%d%H%M%S')[:6])).tolist()
-
-    return converted
-
-
-# def _dateMasker(dateString, version):
-#     mask = (np.where((int(version == 1) and parse(dateString) >= parse(
-#         '2013 04 01')) or (int(version) == 2),
-#                      _vectorizer(_gdeltRangeString, _dateRanger(dateString))[:8],
-#                      np.where(int(version) == 1 and parse(
-#                          dateString) < parse('2006 01'),
-#                               _vectorizer(_gdeltRangeString, _dateRanger(
-#                                   dateString))[:4],
-#                               _vectorizer(_gdeltRangeString, _dateRanger(
-#                                   dateString))[:6]))).tolist()
-#     return mask
-

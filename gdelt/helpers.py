@@ -91,7 +91,7 @@ def _testdate(dateString):
     return comp
 
 
-def _tableinfo(table='cameo',version=2):
+def _tableinfo(table='cameo'):
     """
     Parameters
     -----------
@@ -129,18 +129,13 @@ def _tableinfo(table='cameo',version=2):
             os.path.join(BASE_DIR, 'data', 'cameoCodes.json'),
             dtype={'cameoCode': 'str', "GoldsteinScale": np.float64})
         tabs.set_index('cameoCode', drop=False, inplace=True)
-    elif table == 'events' and float(version) == 1.0:
-        tabs = pd.read_csv(os.path.join(BASE_DIR, 'data', 'events1.csv'))
-
-    elif table == 'events' and float(version) == 2.0:
+  
+    elif table == 'events':
         tabs = pd.read_csv(os.path.join(BASE_DIR, 'data', 'events2.csv'))
 
     elif table == 'gkg' or table == 'graph':
         tabs = pd.read_csv(os.path.join(BASE_DIR, 'data', 'gkg2.csv'))
     elif table == 'mentions' or table == 'ments':
-        if float(version) != 2.0:
-            raise ValueError('GDELT 1.0 does not have a mentions table.')
-        else:
             tabs = pd.read_csv(
                 os.path.join(BASE_DIR, 'data', 'mentions.csv'))
 

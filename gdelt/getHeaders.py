@@ -17,27 +17,6 @@ import pandas as pd
 import requests
 
 
-#######################################
-# Headers for GDELT 1.0 Events
-#######################################
-
-
-
-def _events1Heads():
-    """
-
-    :rtype: dateframe
-    """
-
-    conte = requests.get(
-                ("https://raw.githubusercontent.com/linwoodc3/gdeltPyR"
-                 "/master/utils/schema_csvs/"
-                 "GDELT_1.0_event_Column_Labels_Header_Row_Sep2016.tsv")
-            )
-    data = BytesIO(conte.content)
-    eventsDbHeaders = pd.read_csv(data, delimiter='\t', header=0)
-
-    return eventsDbHeaders[eventsDbHeaders.columns[0]].tolist()
 
 
 #######################################

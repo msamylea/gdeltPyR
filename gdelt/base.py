@@ -95,12 +95,8 @@ class gdelt(object):
 
         Attributes
         ----------
-        version : int, optional, {2,1}
-            The version of GDELT services used by gdelt. 1 or 2
-        gdelt2url : string,default: http://data.gdeltproject.org/gdeltv2/
+        gdelt2url : string,default:  https://api.gdeltproject.org/api/v2/
             Base url for GDELT 2.0 services.
-        gdelt1url : string, default: http://data.gdeltproject.org/events/
-            Base url for GDELT 1.0 services.
         cores : int, optional, default: system-generated
             Count of total CPU cores available.
         pool: function
@@ -123,7 +119,7 @@ class gdelt(object):
         Examples
         --------
         >>> from gdelt
-        >>> gd = gdelt.gdelt(version=2)
+        >>> gd = gdelt.gdelt()
         >>> results = gd.Search(['2016 10 19'],table='events',coverage=True)
         >>> print(len(results))
         244767
@@ -163,9 +159,7 @@ class gdelt(object):
         """
 
     def __init__(self,
-                 gdelt2url='http://data.gdeltproject.org/gdeltv2/',
-                 gdelt1url='http://data.gdeltproject.org/events/',
-                 version=2.0,
+                 gdelt2url=' https://api.gdeltproject.org/api/v2/',
                  cores=cpu_count(),
                  proxies=None
 
@@ -173,13 +167,10 @@ class gdelt(object):
 
         self.codes = codes
         self.translation = None
-        self.version = version
         self.cores = cores
         self.proxies = proxies
-        if int(version) == 2:
-            self.baseUrl = gdelt2url
-        elif int(version) == 1:
-            self.baseUrl = gdelt1url
+        self.baseUrl = gdelt2url
+  
         self.proxies = proxies
         if proxies:
             if isinstance(proxies, dict):
@@ -213,75 +204,9 @@ class gdelt(object):
             pull GDELT data.
 
         table : string,{'events','gkg','mentions'}
-            Select from the table formats offered by the GDELT service:
-
-                * events (1.0 and 2.0)
-
-                    The biggest difference between 1.0 and 2.0 are the
-                    update frequencies.  1.0 data is disseminated daily,
-                    and the most recent data will be published at 6AM
-                    Eastern Standard time of the next day. So, 21 August 2016
-                    results would be available 22 August 2016 at 6AM EST.  2.0
-                    data updates every 15 minutes of the current day.
-
-
-                    Version 1.0  runs from January 1, 1979 through March 31,
-                    2013 contains 57 fields for each record. The Daily
-                    Updates  collection, which begins April 1, 2013 and runs
-                    through present, contains an additional field at the end
-                    of each record, for a total of 58 fields for each
-                    record. The format is dyadic CAMEO format, capturing two
-                    actors and the action performed by Actor1 upon Actor2.
-
-                    Version 2.0 only covers February 19, 2015 onwards,
-                    and is stored in an expanded version of the dyadic CAMEO
-                    format .  See
-                    http://data.gdeltproject.org/documentation/GDELT-Event_
-                    Codebook-V2.0.pdf for more information.
-
-                * gkg  (1.0 and 2.0)
-
-                    **Warning** These tables and queries can be extremely
-                    large and consume a lot of RAM. Consider running a
-                    single days worth of gkg pulls, store to disc,
-                    flush RAM, then proceed to the next day.
-
-                    Table that represents all of the latent dimensions,
-                    geography, and network structure of the global news. It
-                    applies an array of highly sophisticated natural language
-                    processing algorithms to each document to compute a range
-                    of codified metadata encoding key latent and contextual
-                    dimensions of the document.  Version 2.0 includes Global
-                    Content Analysis Measures (GCAM) which reportedly
-                    provides 24 emotional measurement packages that assess
-                    more than 2,300 emotions and themes from every article
-                    in realtime, multilingual  dimensions natively assessing
-                    the emotions of 15 languages (Arabic, Basque, Catalan,
-                    Chinese, French, Galician, German, Hindi, Indonesian,
-                    Korean, Pashto, Portuguese, Russian, Spanish,
-                    and Urdu).See documentation about GKG
-                    1.0 at http://data.gdeltproject.org/documentation/GDELT-
-                    Global_Knowledge_Graph_Codebook.pdf, and GKG 2.0 at http://
-                    data.gdeltproject.org/documentation/GDELT-Global_Knowledge_
-                    Graph_Codebook-V2.1.pdf.
-
-                * mentions  (2.0 only)
-
-                     Mentions table records every mention
-                     of an event over time, along with the timestamp the
-                     article was published. This allows the progression of
-                     an event   through the global media to be tracked,
-                     identifying  outlets that tend to break certain kinds
-                     of events the  earliest or which may break stories
-                     later but are more  accurate in their reporting on
-                     those events. Combined  with the 15 minute update
-                     resolution and GCAM, this also  allows the emotional
-                     reaction and resonance of an event to be assessed as
-                     it sweeps through the world’s media.
-
+           
         coverage : bool, default: False
-            When set to 'True' and the GDELT version parameter is set to 2,
-            gdeltPyR will pull back every 15 minute interval in the day (
+            When set to 'True', gdeltPyR will pull back every 15 minute interval in the day (
             full results) or, if pulling for the current day, pull all 15
             minute intervals up to the most recent 15 minute interval of the
             current our.  For example, if the current date is 22 August,
@@ -311,13 +236,6 @@ class gdelt(object):
             json - Javascript Object Notation output; returns list of
             dictionaries in Python or a list of json objects
 
-            r - writes the cross language dataframe to the current directory.
-            This uses the Feather library found at https://github.com/wesm/
-            feather.  This option returns a pandas dataframe but write the R
-            dataframe to the current working directory. The filename
-            includes all the parameters used to launch the query: version,
-            coverage, table name, query dates, and query time.
-
             csv- Outputs a CSV format; all dates and columns are joined
             
             shp- Writes an ESRI shapefile to current directory or path; output
@@ -336,12 +254,8 @@ class gdelt(object):
             for compatibility with SQL or Shapefile outputs.  
         Examples
         --------
-        >>> from gdelt
-        >>> gd = gdelt.gdelt(version=1)
-        >>> results = gd.Search(['2016 10 19'],table='events',coverage=True)
-        >>> print(len(results))
-        244767
-        >>> gd = gdelt.gdelt(version=2)
+
+        >>> gd = gdelt.gdelt()
         >>> results = gd.Search(['2016 Oct 10'], table='gkg')
         >>> print(len(results))
         2398
@@ -381,16 +295,14 @@ class gdelt(object):
                              ' Choose from "events", "mentions", or "gkg".'
                 .format(table))
 
-        _date_input_check(date, self.version)
+        _date_input_check(date)
         self.coverage = coverage
         self.date = date
-        version = self.version
         baseUrl = self.baseUrl
         self.queryTime = queryTime
         self.table = table
         self.translation = translation
         self.datesString = _gdeltRangeString(_dateRanger(self.date),
-                                            version=version,
                                             coverage=self.coverage)
 
 
@@ -418,203 +330,85 @@ class gdelt(object):
         # Partial Functions
         #################################
 
-        v1RangerCoverage = partial(_gdeltRangeString, version=1,
+        v2RangerCoverage = partial(_gdeltRangeString,
                                    coverage=True)
-        v2RangerCoverage = partial(_gdeltRangeString, version=2,
-                                   coverage=True)
-        v1RangerNoCoverage = partial(_gdeltRangeString, version=1,
+
+        v2RangerNoCoverage = partial(_gdeltRangeString, 
                                      coverage=False)
-        v2RangerNoCoverage = partial(_gdeltRangeString, version=2,
-                                     coverage=False)
-        urlsv1gkg = partial(_urlBuilder, version=1, table='gkg')
-        urlsv2mentions = partial(_urlBuilder, version=2, table='mentions', translation=self.translation)
-        urlsv2events = partial(_urlBuilder, version=2, table='events', translation=self.translation)
-        urlsv1events = partial(_urlBuilder, version=1, table='events')
-        urlsv2gkg = partial(_urlBuilder, version=2, table='gkg', translation=self.translation)
+        urlsv2mentions = partial(_urlBuilder, table='mentions', translation=self.translation)
+        urlsv2events = partial(_urlBuilder,table='events', translation=self.translation)
+        urlsv2gkg = partial(_urlBuilder, table='gkg', translation=self.translation)
 
         eventWork = partial(_mp_worker, table='events', proxies=self.proxies)
         codeCams = partial(_cameos, codes=codes)
 
-        #####################################
-        # GDELT Version 2.0 Headers
-        #####################################
 
-        if int(self.version) == 2:
-            ###################################
-            # Download 2.0 Headers
-            ###################################
 
-            if self.table =='events':
-                try:
-                    self.events_columns = \
-                    pd.read_csv(os.path.join(BASE_DIR, "data", 'events2.csv'))[
-                        'name'].values.tolist()
-
-                except:  # pragma: no cover
-                    self.events_columns = _events2Heads()
-
-            elif self.table == 'mentions':
-                try:
-                    self.mentions_columns = \
-                        pd.read_csv(
-                            os.path.join(BASE_DIR, "data", 'mentions.csv'))[
-                            'name'].values.tolist()
-
-                except:  # pragma: no cover
-                    self.mentions_columns = _mentionsHeads()
-            else:
-                try:
-                    self.gkg_columns = \
-                        pd.read_csv(
-                            os.path.join(BASE_DIR, "data", 'gkg2.csv'))[
-                            'name'].values.tolist()
-
-                except:  # pragma: no cover
-                    self.gkg_columns = _gkgHeads()
-
-        #####################################
-        # GDELT Version 1.0 Analytics, Header, Downloads
-        #####################################
-
-        if int(self.version) == 1:
-
-            if self.table == "mentions":
-                raise ValueError('GDELT 1.0 does not have the "mentions"'
-                                    ' table. Specify the "events" or "gkg"'
-                                    'table.')
-            if self.translation:
-                raise ValueError('GDELT 1.0 does not have an option to'
-                                    ' return translated table data. Switch to '
-                                    'version 2 by reinstantiating the gdelt '
-                                    'object with <gd = gdelt.gdelt(version=2)>')
-            else:
-                pass
-
+        if self.table =='events':
             try:
                 self.events_columns = \
-                    pd.read_csv(os.path.join(BASE_DIR, "data", 'events1.csv'))[
+                pd.read_csv(os.path.join(BASE_DIR, "data", 'events2.csv'))[
+                    'name'].values.tolist()
+
+            except:  # pragma: no cover
+                self.events_columns = _events2Heads()
+
+        elif self.table == 'mentions':
+            try:
+                self.mentions_columns = \
+                    pd.read_csv(
+                        os.path.join(BASE_DIR, "data", 'mentions.csv'))[
                         'name'].values.tolist()
 
             except:  # pragma: no cover
-                self.events_columns = _events1Heads()
+                self.mentions_columns = _mentionsHeads()
+        else:
+            try:
+                self.gkg_columns = \
+                    pd.read_csv(
+                        os.path.join(BASE_DIR, "data", 'gkg2.csv'))[
+                        'name'].values.tolist()
 
+            except:  # pragma: no cover
+                self.gkg_columns = _gkgHeads()
+
+
+
+        if self.table == 'events' or self.table == '':
             columns = self.events_columns
+            if self.coverage is True:  # pragma: no cover
 
-            if self.table == 'gkg':
-                self.download_list = (urlsv1gkg(v1RangerCoverage(
+                self.download_list = (urlsv2events(v2RangerCoverage(
+                    _dateRanger(self.date))))
+            else:
+
+                self.download_list = (urlsv2events(v2RangerNoCoverage(
                     _dateRanger(self.date))))
 
-            elif self.table == 'events' or self.table == '':
+        if self.table == 'gkg':
+            columns = self.gkg_columns
+            if self.coverage is True:  # pragma: no cover
 
-                if self.coverage is True:  # pragma: no cover
+                self.download_list = (urlsv2gkg(v2RangerCoverage(
+                    _dateRanger(self.date))))
+            else:
+                self.download_list = (urlsv2gkg(v2RangerNoCoverage(
+                    _dateRanger(self.date))))
+                # print ("2 gkg", urlsv2gkg(self.datesString))
 
-                    self.download_list = (urlsv1events(v1RangerCoverage(
-                        _dateRanger(self.date))))
+        if self.table == 'mentions':
+            columns = self.mentions_columns
+            if self.coverage is True:  # pragma: no cover
 
-                else:
-                    # print("I'm here at line 125")
-                    self.download_list = (urlsv1events(v1RangerNoCoverage(
-                        _dateRanger(self.date))))
+                self.download_list = (urlsv2mentions(v2RangerCoverage(
+                    _dateRanger(self.date))))
 
-            else:  # pragma: no cover
-                raise Exception('You entered an incorrect table type for '
-                                'GDELT 1.0.')
-        #####################################
-        # GDELT Version 2.0 Analytics and Download
-        #####################################
-        elif self.version == 2:
+            else:
 
-            if self.table == 'events' or self.table == '':
-                columns = self.events_columns
-                if self.coverage is True:  # pragma: no cover
-
-                    self.download_list = (urlsv2events(v2RangerCoverage(
-                        _dateRanger(self.date))))
-                else:
-
-                    self.download_list = (urlsv2events(v2RangerNoCoverage(
-                        _dateRanger(self.date))))
-
-            if self.table == 'gkg':
-                columns = self.gkg_columns
-                if self.coverage is True:  # pragma: no cover
-
-                    self.download_list = (urlsv2gkg(v2RangerCoverage(
-                        _dateRanger(self.date))))
-                else:
-                    self.download_list = (urlsv2gkg(v2RangerNoCoverage(
-                        _dateRanger(self.date))))
-                    # print ("2 gkg", urlsv2gkg(self.datesString))
-
-            if self.table == 'mentions':
-                columns = self.mentions_columns
-                if self.coverage is True:  # pragma: no cover
-
-                    self.download_list = (urlsv2mentions(v2RangerCoverage(
-                        _dateRanger(self.date))))
-
-                else:
-
-                    self.download_list = (urlsv2mentions(v2RangerNoCoverage(
-                        _dateRanger(self.date))))
+                self.download_list = (urlsv2mentions(v2RangerNoCoverage(
+                    _dateRanger(self.date))))
 
 
-        #########################
-        # DEBUG Print Section
-        #########################
-
-
-        # if isinstance(self.datesString,str):
-        #     if parse(self.datesString) < datetime.datetime.now():
-        #         self.datesString = (self.datesString[:8]+"234500")
-        # elif isinstance(self.datesString,list):
-        #     print("it's a list")
-        # elif isinstance(self.datesString,np.ndarray):
-        #     print("it's an array")
-        # else:
-        #     print("don't know what it is")
-        # print (self.version,self.download_list,self.date, self.table, self.coverage, self.datesString)
-        #
-        # print (self.download_list)
-        # if self.coverage:
-        #     coverage = 'True'
-        # else:
-        #     coverage = 'False'
-        # if isinstance(self.date, list):
-        #
-        #     formattedDates = ["".join(re.split(' |-|;|:', l)) for l in
-        #                       self.date]
-        #     path = formattedDates
-        #     print("gdeltVersion_" + str(self.version) +
-        #           "_coverage_" + coverage + "_" +
-        #           "_table_" + self.table + '_queryDates_' +
-        #           "_".join(path) +
-        #           "_queryTime_" +
-        #           datetime.datetime.now().strftime('%m-%d-%YT%H%M%S'))
-        # else:
-        #     print("gdeltVersion_" + str(self.version) +
-        #           "_coverage_" + coverage + "_" +
-        #           "_table_" + self.table + '_queryDates_' +
-        #           "".join(re.split(' |-|;|:', self.date)) +
-        #           "_queryTime_" +
-        #           datetime.datetime.now().strftime('%m-%d-%YT%H%M%S'))
-
-        #########################
-        # Download section
-        #########################
-        # print(self.download_list,type(self.download_list))
-
-        # from gdelt.extractors import normalpull
-        # e=ProcessPoolExecutor()
-        # if isinstance(self.download_list,list) and len(self.download_list)==1:
-        #     from gdelt.extractors import normalpull
-        #
-        #     results=normalpull(self.download_list[0],table=self.table)
-        # elif isinstance(self.download_list,list):
-        #     print(table)
-        #     multilist = list(e.map(normalpull,self.download_list))
-        #     results = pd.concat(multilist)
-        # print(results.head())
 
         if isinstance(self.datesString, str):
             if self.table == 'events':
@@ -639,30 +433,17 @@ class gdelt(object):
                 pool.join()
             else:
 
-                #pool = NoDaemonProcessPool(processes=cpu_count())
+           
                 with concurrent.futures.ProcessPoolExecutor() as executor:
                     # Submit tasks to the executor
                     downloaded_dfs = list(executor.map(_mp_worker,self.download_list))
 
-                    # downloaded_dfs = []
-                    #
-                    # # Wait for all of the tasks to finish executing
-                    # for result in results:
-                    #     downloaded_dfs = downloaded_dfs.append(results)
-                # downloaded_dfs = list(pool.imap_unordered(_mp_worker,
-                #                                           self.download_list,
-                #                                           ))
 
             # print(downloaded_dfs)
             results = pd.concat(downloaded_dfs)
             del downloaded_dfs
             results.reset_index(drop=True, inplace=True)
 
-
-        if self.table == 'gkg' and self.version == 1:
-            results.columns = results.iloc[0].values.tolist()
-            results.drop([0], inplace=True)
-            columns = results.columns
 
         # check for empty dataframe
         if results is not None:
@@ -706,38 +487,6 @@ class gdelt(object):
             self.final = _geofilter(results)
             self.final = self.final[self.final.geometry.notnull()]
 
-        # r dataframe output
-        elif output == 'r':  # pragma: no cover
-            if self.coverage:
-                coverage = 'True'
-            else:
-                coverage = 'False'
-            if isinstance(self.date, list):
-
-                formattedDates = ["".join(re.split(' |-|;|:', l)) for l in
-                                  self.date]
-                path = formattedDates
-                outPath = ("gdeltVersion_" + str(self.version) +
-                           "_coverage_" + coverage + "_" +
-                           "_table_" + self.table + '_queryDates_' +
-                           "_".join(path) +
-                           "_queryTime_" +
-                           datetime.datetime.now().strftime('%m-%d-%YT%H%M%S') +
-                           ".feather")
-            else:
-                outPath = ("gdeltVersion_" + str(self.version) +
-                           "_coverage_" + coverage + "_" +
-                           "_table_" + self.table + '_queryDates_' +
-                           "".join(re.split(' |-|;|:', self.date)) +
-                           "_queryTime_" +
-                           datetime.datetime.now().strftime('%m-%d-%YT%H%M%S') +
-                           ".feather")
-
-            if normcols:
-                results.columns = list(map(lambda x: (x.replace('_', "")).lower(), results.columns))
-
-            feather.api.write_dataframe(results, outPath)
-            return results
 
         else:
             self.final = results
@@ -767,5 +516,4 @@ class gdelt(object):
             pandas dataframe with schema
         """
 
-        return _tableinfo(table=tablename,
-                          version=self.version)  # pragma: no cover
+        return _tableinfo(table=tablename)  # pragma: no cover

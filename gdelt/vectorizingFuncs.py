@@ -25,7 +25,7 @@ from gdelt.multipdf import _parallelize_dataframe
 
 
 
-def _urlBuilder(dateString, version, table='events', translation=False):
+def _urlBuilder(dateString, table='events', translation=False):
     """
     Takes date string from gdeltRange string and creates GDELT urls
 
@@ -37,21 +37,13 @@ def _urlBuilder(dateString, version, table='events', translation=False):
                 * events and mentions (default)
                 * gkg
                 * mentions only
-                :type version: object
                 :param dateString:
-                :param version:
                 :param table:
     """
 
-    if version == 2:
-        base = "http://data.gdeltproject.org/gdeltv2/"
-
-    if version == 1:
-        base = "http://data.gdeltproject.org/"
+    base = "http://data.gdeltproject.org/gdeltv2/"
 
     if table == "events":
-        if version == 1:
-            base += 'events/'
         if not translation:
             caboose = ".export.CSV.zip"
         else:
@@ -62,24 +54,6 @@ def _urlBuilder(dateString, version, table='events', translation=False):
         else:
             caboose = ".translation.mentions.CSV.zip"
     elif table == "gkg":
-        if version == 1:
-            base += 'gkg/'
-            if isinstance(dateString,str):
-                comp = _testdate(dateString)
-                if comp < parse('2013 Apr 1'):
-                    raise Exception('GDELT 1.0 Global Knowledge Graph requires dates greater'
-                                    ' than or equal to April 1 2013')
-            elif isinstance(dateString, list) or isinstance(dateString,
-                                                          np.ndarray):
-                if not (np.all(list(
-                        map(
-                            lambda x: x > parse('2013 04 01'), list(
-                                map(
-                                    _testdate, dateString)))))):
-                    raise Exception('GDELT 1.0 Global Knowledge Graph requires dates greater'
-                                    ' than or equal to April 1 2013')
-
-
         if not translation:
             caboose = ".gkg.csv.zip"
         else:
@@ -108,12 +82,6 @@ def _urlBuilder(dateString, version, table='events', translation=False):
                 test = str(parse(str(l)))
                 newdate.append(test)
 
-        if version ==1:
-            if table != 'gkg':
-                # print(base)
-                base
-                # print("After {}".format(base))
-
         if not (np.all(list(
                 map(
                     lambda x: x > parse('2013 04 01'), list(
@@ -132,19 +100,7 @@ def _urlBuilder(dateString, version, table='events', translation=False):
 
     elif isinstance(dateString, str) is True or len(dateString) == 1:
 
-        if version == 1:
-            if table=='events':
-                if len(dateString) == 4:
-                    comp = datetime.datetime.strptime(dateString,'%Y')
-                elif len(dateString) == 6:
-                    comp = datetime.datetime.strptime(dateString, '%Y%m')
-                else:
-                    comp = parse(dateString)
-                if comp < parse('2013 Apr 01'):
-                    caboose = ".zip"
-                elif table == 'events':
-                    caboose = ".export.CSV.zip"
-
+       
         if isinstance(dateString, list) is True or isinstance(
                 dateString, np.ndarray) is True:  # pragma: no cover
             dateString = dateString[0]
